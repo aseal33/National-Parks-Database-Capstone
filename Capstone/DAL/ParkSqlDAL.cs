@@ -51,6 +51,6 @@ namespace Capstone.DAL
                 throw;
             }
             return output;
-            }                  
+        }                
     }
 }
