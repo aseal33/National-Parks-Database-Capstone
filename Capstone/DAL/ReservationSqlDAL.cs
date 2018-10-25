@@ -16,9 +16,28 @@ namespace Capstone.DAL
             this.ConnectionString = connectionString;
         }
 
-        public int ReserveCampsite(Campsite newCampsite)
+        public int ReserveCampsite(Campsite campsiteRequested, DateTime start_date, DateTime end_date, string partyName)
         {
-            throw new NotImplementedException();
+            int id = 0;
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    SqlCommand command = new SqlCommand($"INSERT INTO reservation VALUES (site_id, '{partyName} Family Reservation', {start_date}, {end_date}, CURRENT_TIMESTAMP)", conn);
+                    SqlCommand sql = new SqlCommand("DECLARE @reservationID int = (SELECT @@IDENITY)");
+
+                    SqlDataReader reader = sql.ExecuteReader();
+
+                    id = Convert.ToInt32(reader["@reservationID"]);                   
+                }
+                return id;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("I'm sorry friend, you can't reserve greatness");
+                throw;
+            }
         }
     }
 }
