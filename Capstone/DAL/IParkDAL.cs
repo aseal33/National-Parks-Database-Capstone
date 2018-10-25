@@ -8,5 +8,6 @@ namespace Capstone.DAL
     public interface IParkDAL
     {
         IList<Park> GetAllParks();
+        Park GetParkInfo(int Park_Id);
     }
 }

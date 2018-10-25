@@ -51,9 +51,9 @@ namespace Capstone.DAL
             return output;
         }
 
-        public IList<Campground> CampgroundAvailability(Campground campgroundToBook, DateTime start_date, DateTime end_date)
+        public IList<Campsite> CampgroundAvailability(Campground campgroundToBook, DateTime start_date, DateTime end_date)
         {
-            List<Campground> output = new List<Campground>();
+            List<Campsite> output = new List<Campsite>();
             try
             {
                 using (SqlConnection conn = new SqlConnection(this.ConnectionString))
@@ -73,14 +73,15 @@ namespace Capstone.DAL
 
                     while (reader.Read())
                     {
-                        Campground campground = new Campground();
-                        campground.Campground_Id = Convert.ToInt32(reader["campground_id"]);
-                        campground.Park_Id = Convert.ToInt32(reader["park_id"]);
-                        campground.Name = Convert.ToString(reader["name"]);
-                        campground.Opening_Month = Convert.ToInt32(reader["open_from_mm"]);
-                        campground.Closing_Month = Convert.ToInt32(reader["open_to_mm"]);
-                        campground.Daily_Fee = Convert.ToDecimal(reader["daily_fee"]);
-                        output.Add(campground);
+                        Campsite campsite= new Campsite();
+                        campsite.Campground_Id = Convert.ToInt32(reader["campground_id"]);
+                        campsite.Site_Id = Convert.ToInt32(reader["site_id"]);
+                        campsite.Site_Number = Convert.ToInt32(reader["site_number"]);
+                        campsite.Max_Occupancy = Convert.ToInt32(reader["max_occupancy"]);
+                        campsite.IsAccessible = Convert.ToBoolean(reader["accessible"]);
+                        campsite.Max_RV_Length = Convert.ToInt32(reader["max_rv_length"]);
+                        campsite.HasUtilities = Convert.ToBoolean(reader["utilities"]);
+                        output.Add(campsite);
                     }
                 }
             }

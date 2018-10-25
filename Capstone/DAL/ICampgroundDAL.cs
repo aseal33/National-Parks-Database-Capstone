@@ -8,6 +8,6 @@ namespace Capstone.DAL
     public interface ICampgroundDAL
     {
         IList<Campground> GetCampgroundsFromPark(Park newPark);
-        IList<Campground> CampgroundAvailability(Campground campgroundToBook, DateTime start_date, DateTime end_date);
+        IList<Campsite> CampgroundAvailability(Campground campgroundToBook, DateTime start_date, DateTime end_date);
     }
 }
