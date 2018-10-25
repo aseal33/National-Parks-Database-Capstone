@@ -6,8 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DAL\" />
-    <Folder Include="Models\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 
