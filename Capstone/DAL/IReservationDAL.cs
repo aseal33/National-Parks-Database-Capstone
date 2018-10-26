@@ -7,6 +7,8 @@ namespace Capstone.DAL
 {
     public interface IReservationDAL
     {
-        int ReserveCampsite(Campsite campsiteRequested, DateTime start_date, DateTime end_date, string partyName);
+        int ReserveCampsite(int campsiteId, DateTime start_date, DateTime end_date, string partyName);
+
+        int CountReservations(int campsiteID);
     }
 }
