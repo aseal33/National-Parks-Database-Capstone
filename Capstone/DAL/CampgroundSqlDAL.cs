@@ -60,14 +60,19 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
+                    if (start_date.Month < campgroundToBook.Opening_Month || end_date.Month > campgroundToBook.Closing_Month)
+                    {
+                        Console.WriteLine("GO AWAY! WE CLOSED!!!!");
+                        return output;
+                    }
+
                     string query = "SELECT site_id FROM site " +
                         $"WHERE campground_id = {campgroundToBook.Campground_Id} " +
                         "EXCEPT " +
                         "SELECT reservation.site_id FROM reservation " +
                         "INNER JOIN site ON site.site_id = reservation.site_id " +
                         $"WHERE campground_id = {campgroundToBook.Campground_Id} AND ((to_date BETWEEN \'{start_date}\' AND \'{end_date}\') " +
-                        $"OR (from_date BETWEEN \'{start_date}\' AND \'{end_date}\')); ";
-
+                        $"OR (from_date BETWEEN \'{start_date}\' AND \'{end_date}\') OR ((to_date >= '{start_date}') AND (from_date <= '{end_date}')))";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     SqlDataReader reader = cmd.ExecuteReader();
 
