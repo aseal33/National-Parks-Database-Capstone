@@ -109,20 +109,20 @@ namespace Capstone.Models
 
                 }
                 
-                switch ()
-                {
+                //switch ()
+                //{
                     
                     
 
-                    case Command_Quit:
-                        Console.WriteLine("Thank you for using the campground system.");
-                        return;
+                //    case Command_Quit:
+                //        Console.WriteLine("Thank you for using the campground system.");
+                //        return;
 
-                    default:
-                        Console.WriteLine("The command provided was not a valid command, please try again.");
-                        break;
+                //    default:
+                //        Console.WriteLine("The command provided was not a valid command, please try again.");
+                //        break;
 
-                }
+                //}
 
                 PrintFooter();
             }
