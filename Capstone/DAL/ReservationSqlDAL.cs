@@ -25,7 +25,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
                     SqlCommand command = new SqlCommand($"INSERT INTO reservation VALUES (site_id, '{partyName} Family Reservation', {start_date}, {end_date}, CURRENT_TIMESTAMP)", conn);
-                    SqlCommand sql = new SqlCommand("DECLARE @reservationID int = (SELECT @@IDENITY)");
+                    SqlCommand sql = new SqlCommand("DECLARE @reservationID int = (SELECT @@IDENITY)", conn);
 
                     SqlDataReader reader = sql.ExecuteReader();
 
