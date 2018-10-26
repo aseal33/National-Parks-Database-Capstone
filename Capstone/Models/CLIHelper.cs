@@ -33,7 +33,7 @@ namespace Capstone.Models
 
         public static int GetInteger(string message)
         {
-            string userInput = String.Empty;
+            string userInput = string.Empty;
             int intValue = 0;
             int numberOfAttempts = 0;
 
@@ -67,7 +67,7 @@ namespace Capstone.Models
 
         public static double GetDouble(string message)
         {
-            string userInput = String.Empty;
+            string userInput = string.Empty;
             double doubleValue = 0.0;
             int numberOfAttempts = 0;
 
@@ -86,12 +86,11 @@ namespace Capstone.Models
             while (!double.TryParse(userInput, out doubleValue));
 
             return doubleValue;
-
         }
 
         public static bool GetBool(string message)
         {
-            string userInput = String.Empty;
+            string userInput = string.Empty;
             bool boolValue = false;
             int numberOfAttempts = 0;
 
@@ -114,7 +113,7 @@ namespace Capstone.Models
 
         public static string GetString(string message)
         {
-            string userInput = String.Empty;
+            string userInput = string.Empty;
             int numberOfAttempts = 0;
 
             do
@@ -129,7 +128,7 @@ namespace Capstone.Models
                 CheckQuit(userInput);
                 numberOfAttempts++;
             }
-            while (String.IsNullOrEmpty(userInput));
+            while (string.IsNullOrEmpty(userInput));
 
             return userInput;
         }

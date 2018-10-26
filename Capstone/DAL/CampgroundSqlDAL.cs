@@ -1,10 +1,10 @@
-﻿using Capstone.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using Capstone.Models;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.SqlClient;
 
 namespace Capstone.DAL
 {
@@ -16,6 +16,7 @@ namespace Capstone.DAL
         {
             this.ConnectionString = connectionString;
         }
+
         public IList<Campground> GetCampgroundsFromPark(Park newPark)
         {
             List<Campground> output = new List<Campground>();
@@ -95,8 +96,8 @@ namespace Capstone.DAL
                 Console.WriteLine("Creativity is in another castle; I have no idea.");
                 throw;
             }
+
             return output;
         }
-
     }
 }

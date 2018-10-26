@@ -21,7 +21,7 @@ namespace Capstone.DAL
             int id = 0;
             try
             {
-                using (SqlConnection conn = new SqlConnection(ConnectionString))
+                using (SqlConnection conn = new SqlConnection(this.ConnectionString))
                 {
                     conn.Open();
                     SqlCommand command = new SqlCommand($"INSERT INTO reservation VALUES (site_id, '{partyName} Family Reservation', {start_date}, {end_date}, CURRENT_TIMESTAMP)", conn);
@@ -29,8 +29,9 @@ namespace Capstone.DAL
 
                     SqlDataReader reader = sql.ExecuteReader();
 
-                    id = Convert.ToInt32(reader["@reservationID"]);                   
+                    id = Convert.ToInt32(reader["@reservationID"]);
                 }
+
                 return id;
             }
             catch (SqlException ex)

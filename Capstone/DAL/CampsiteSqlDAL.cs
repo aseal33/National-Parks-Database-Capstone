@@ -8,7 +8,6 @@ using System.Data.SqlClient;
 
 namespace Capstone.DAL
 {
-
     public class CampsiteSqlDAL : ICampsiteDAL
     {
         private string ConnectionString;

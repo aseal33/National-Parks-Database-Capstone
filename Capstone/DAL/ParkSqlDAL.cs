@@ -1,10 +1,10 @@
-﻿using Capstone.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
+using Capstone.Models;
 
 namespace Capstone.DAL
 {
@@ -15,7 +15,7 @@ namespace Capstone.DAL
         // Single Parameter Constructor
         public ParkSqlDAL(string dbConnectionString)
         {
-            connectionString = dbConnectionString;
+            this.connectionString = dbConnectionString;
         }
 
         public IList<Park> GetAllParks()
@@ -23,7 +23,7 @@ namespace Capstone.DAL
             List<Park> output = new List<Park>();
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlConnection conn = new SqlConnection(this.connectionString))
                 {
                     conn.Open();
                     SqlCommand command = new SqlCommand("SELECT park.park_id, park.name FROM Park ORDER BY name", conn);
@@ -33,11 +33,6 @@ namespace Capstone.DAL
                     {
                         Park park = new Park();
                         park.Name = Convert.ToString(reader["name"]);
-                        //park.Location = Convert.ToString(reader["location"]);
-                        //park.EstablishedDate = Convert.ToDateTime(reader["establish_date"]);
-                        //park.Description = Convert.ToString(reader["description"]);
-                        //park.Area = Convert.ToInt32(reader["area"]);
-                        //park.AnnualVisitorCount = Convert.ToInt32(reader["visitors"]);
                         park.Park_Id = Convert.ToInt32(reader["park_id"]);
 
                         output.Add(park);
@@ -50,14 +45,15 @@ namespace Capstone.DAL
                 Console.WriteLine("Ya played yourself, friend. Ain't no parks here.");
                 throw;
             }
+
             return output;
-        } 
-        
+        }
+
         public Park GetParkInfo(int Park_Id)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlConnection conn = new SqlConnection(this.connectionString))
                 {
                     conn.Open();
                     SqlCommand command = new SqlCommand("SELECT * FROM park WHERE park.park_id = @parkId", conn);
@@ -66,15 +62,16 @@ namespace Capstone.DAL
                     SqlDataReader reader = command.ExecuteReader();
                     Park park = new Park();
                     while (reader.Read())
-                    {                        
+                    {
                         park.Name = Convert.ToString(reader["name"]);
                         park.Location = Convert.ToString(reader["location"]);
                         park.EstablishedDate = Convert.ToDateTime(reader["establish_date"]);
                         park.Description = Convert.ToString(reader["description"]);
                         park.Area = Convert.ToInt32(reader["area"]);
                         park.AnnualVisitorCount = Convert.ToInt32(reader["visitors"]);
-                        park.Park_Id = Convert.ToInt32(reader["park_id"]);                        
+                        park.Park_Id = Convert.ToInt32(reader["park_id"]);
                     }
+
                     return park;
                 }
             }

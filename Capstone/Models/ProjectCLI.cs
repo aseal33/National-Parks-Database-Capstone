@@ -19,14 +19,10 @@ namespace Capstone.Models
         const string Command_GetAllParks = "1"; // in park // park id and park name 
         const string Command_GetParkInfo = "2"; // in park // returns park - give int park id
 
-
-        
-
         // CAMPGROUNDS 
         const string Level_Campgrounds = "B";
         const string Command_GetAllCampgroundsFromPark = "1"; // in campground 
         const string Command_GetCampgroundAvailability = "2"; // in campground
-
 
         // CAMPGROUND
         const string Level_Campground = "C";
@@ -46,42 +42,42 @@ namespace Capstone.Models
 
         public void RunCLI()
         {
-            Level_Current = Level_Parks;
+            this.Level_Current = Level_Parks;
             string command;
 
             while (true)
             {
-                if (Level_Current == Level_Parks)
+                if (this.Level_Current == Level_Parks)
                 {
-                    PrintHeader();
-                    GetAllParks_View();
-                    
+                    this.PrintHeader();
+                    this.GetAllParks_View();
+
                     // See which park they want to see
                     int chosenPark = CLIHelper.GetInteger("Which park would you like to visit?");
 
                     // see that park
-                    GetPark_View(chosenPark);
+                    this.GetPark_View(chosenPark);
 
                     // Ask what they want to do next
-                    Park_View_AskNext();
+                    this.Park_View_AskNext();
                     command = Console.ReadLine();
 
                     switch (command)
                     {
                         case Command_GetAllCampgroundsFromPark:
-                            Level_Current = Level_Campgrounds;
+                            this.Level_Current = Level_Campgrounds;
                             continue;
                         case Command_GetCampgroundAvailability:
-                            Level_Current = Level_Campground;
+                            this.Level_Current = Level_Campground;
                             continue;
                         case "3":
-                            Level_Current = Level_Parks;
+                            this.Level_Current = Level_Parks;
                             continue;
                     }
 
-                    if(Level_Current == Level_Campgrounds)
+                    if(this.Level_Current == Level_Campgrounds)
                     {
-                        PrintHeader();
+                        this.PrintHeader();
 
                     }
                 }
@@ -97,7 +93,7 @@ namespace Capstone.Models
             {
                 foreach (Park park in this.AllParks)
                 {
-                    PrintOption(park.Park_Id.ToString(), park.Name);
+                    this.PrintOption(park.Park_Id.ToString(), park.Name);
                 }
             }
             else
@@ -112,10 +108,10 @@ namespace Capstone.Models
             ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
             Park park = dal.GetParkInfo(chosenPark);
             Console.WriteLine(park.Name);
-            PrintInfo("Location", park.Location);
-            PrintInfo("Established", park.EstablishedDate.ToShortDateString());
-            PrintInfo("Area", park.Area.ToString("#,# sq km"));
-            PrintInfo("Annual Visitors", park.AnnualVisitorCount.ToString("#,#"));
+            this.PrintInfo("Location", park.Location);
+            this.PrintInfo("Established", park.EstablishedDate.ToShortDateString());
+            this.PrintInfo("Area", park.Area.ToString("#,# sq km"));
+            this.PrintInfo("Annual Visitors", park.AnnualVisitorCount.ToString("#,#"));
             Console.WriteLine();
             Console.WriteLine(park.Description);
             Console.WriteLine();
@@ -124,17 +120,16 @@ namespace Capstone.Models
         private void Park_View_AskNext()
         {
             Console.WriteLine("Select a Command:");
-            PrintOption("1", "View Campgrounds");
-            PrintOption("2", "Search for a Reservation.");
-            PrintOption("3", "Return to previous screen.");
+            this.PrintOption("1", "View Campgrounds");
+            this.PrintOption("2", "Search for a Reservation.");
+            this.PrintOption("3", "Return to previous screen.");
         }
 
-        
         private void PrintOption (string choice, string text)
         {
             Console.WriteLine($" {choice} - ".PadRight(8) + text );
         }
-        
+
         private void PrintInfo(string text, string description)
         {
             Console.WriteLine($" {text}:".PadRight(20) + description);
@@ -164,12 +159,11 @@ namespace Capstone.Models
 
         private void PrintFooter()
         {
-            PrintOption("Q", "Quit");
+            this.PrintOption("Q", "Quit");
         }
 
         private void PrintMenu(int level)
         {
-            
 
         }
 
