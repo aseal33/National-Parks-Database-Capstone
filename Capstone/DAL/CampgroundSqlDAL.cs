@@ -67,7 +67,7 @@ namespace Capstone.DAL
                         return output;
                     }
 
-                    string query = "SELECT site.site_id, campground.daily_fee FROM site INNER JOIN campground " +
+                    string query = "SELECT * FROM site INNER JOIN campground " +
                         "ON campground.campground_id = site.campground_id WHERE site.site_id IN (SELECT site_id FROM site " +
                         $"WHERE campground_id = {campgroundToBook.Campground_Id} " +
                         "EXCEPT " +
