@@ -33,11 +33,11 @@ namespace Capstone.DAL
                     {
                         Park park = new Park();
                         park.Name = Convert.ToString(reader["name"]);
-                        park.Location = Convert.ToString(reader["location"]);
-                        park.EstablishedDate = Convert.ToDateTime(reader["establish_date"]);
-                        park.Description = Convert.ToString(reader["description"]);
-                        park.Area = Convert.ToInt32(reader["area"]);
-                        park.AnnualVisitorCount = Convert.ToInt32(reader["visitors"]);
+                        //park.Location = Convert.ToString(reader["location"]);
+                        //park.EstablishedDate = Convert.ToDateTime(reader["establish_date"]);
+                        //park.Description = Convert.ToString(reader["description"]);
+                        //park.Area = Convert.ToInt32(reader["area"]);
+                        //park.AnnualVisitorCount = Convert.ToInt32(reader["visitors"]);
                         park.Park_Id = Convert.ToInt32(reader["park_id"]);
 
                         output.Add(park);

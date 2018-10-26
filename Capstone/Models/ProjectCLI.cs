@@ -13,89 +13,109 @@ namespace Capstone.Models
         // reserve campsite - changing
 
         // PARKS
-        //const string Command_GetAllParks = "1"; // in park // park id and park name 
-        //const string Command_GetParkInfo = "2"; // in park // returns park - give int park id
+        public IList<Park> AllParks;
+        //const string Level_Top = "P1";
+        const string Level_Parks = "A";
+        const string Command_GetAllParks = "1"; // in park // park id and park name 
+        const string Command_GetParkInfo = "2"; // in park // returns park - give int park id
 
-        const int Level_Top = 0;
 
-        const int Level_Parks = 1;
         
 
-        const int Level_Campgrounds = 2;
         // CAMPGROUNDS 
+        const string Level_Campgrounds = "B";
         const string Command_GetAllCampgroundsFromPark = "1"; // in campground 
         const string Command_GetCampgroundAvailability = "2"; // in campground
 
 
-        const int Level_Campground = 3;
         // CAMPGROUND
+        const string Level_Campground = "C";
         const string Command_GetCampsitesFromCampground = "1"; // in campsite
-        const string Command_GetCampGroundAvailability = "2";
-        const string Command_ChooseCampground = "3";
-        const string Command_BackToCampgrounds = "4";
+        const string Command_ChooseCampground = "2";
+        const string Command_BackToCampgrounds = "3";
 
-        const int Level_Reservation = 4;
         // RESERVATION
+        const string Level_Reservation = "D";
         const string Command_ChooseCampsite = "1";
         const string Command_ReserveCampsite = "2";
 
-        const string Command_Quit = "q";
-        const string DatabaseConnection = @"Data Source =.\sqlexpress;Initial Catalog = EmployeeDB; Integrated Security = True";
+        const string Command_Quit = "Q";
+        const string DatabaseConnection = @"Data Source =.\sqlexpress;Initial Catalog = NPCampsite; Integrated Security = True";
+
+        private string Level_Current;
+
+        public void LevelMaster()
+        {
+            // We start off on the parks level
+            Level_Current = Level_Parks;
+
+            do
+            {
+                // Which level are we on of the system?
+                switch (Level_Current)
+                {
+                    case Level_Parks:
+
+                        break;
+                    case Level_Campgrounds:
+
+                        break;
+                    case Level_Campground:
+
+                        break;
+                    case Level_Reservation:
+
+                        break;
+                    case Command_Quit:
+                        Console.WriteLine("Thank you for using the campground system.");
+                        return;
+                }
+                string command = Console.ReadLine();
+            } while (true);
+        }
+
 
         public void RunCLI()
         {
-            PrintHeader(Level_Top);
-
+            Level_Current = Level_Parks;
+            string command;
             while (true)
             {
-                string command = Console.ReadLine();
+                PrintHeader();
 
-                Console.Clear();
-
-                switch (command.ToLower())
+                if (Level_Current == Level_Parks)
                 {
-                    case Command_AllDepartments:
-                        GetAllDepartments();
-                        break;
+                    GetAllParks_View();
+                    int chosenPark = CLIHelper.GetInteger("Which park would you like to visit?");
+                    Console.Clear();
+                    GetPark_View(chosenPark);
+                    Console.WriteLine("Select a Command:");
+                    PrintOption("1", "View Campgrounds");
+                    PrintOption("2", "Search for a Reservation.");
+                    PrintOption("3", "Return to previous screen.");
+                    command = Console.ReadLine();
+                    switch(command)
+                    {
+                        case Command_GetAllCampgroundsFromPark:
 
-                    case Command_AllEmployees:
-                        GetAllEmployees();
-                        break;
+                            break;
+                        case Command_GetCampgroundAvailability:
 
-                    case Command_EmployeeSearch:
-                        EmployeeSearch();
-                        break;
+                            break;
+                        case "3":
+                            Level_Current = Level_Parks;
+                            continue;
+                    }
 
-                    case Command_EmployeesWithoutProjects:
-                        GetEmployeesWithoutProjects();
-                        break;
-
-                    case Command_ProjectList:
-                        GetAllProjects();
-                        break;
-
-                    case Command_CreateDepartment:
-                        CreateDepartment();
-                        break;
-
-                    case Command_UpdateDepartment:
-                        UpdateDepartment();
-                        break;
-
-                    case Command_CreateProject:
-                        CreateProject();
-                        break;
-
-                    case Command_AssignEmployeeToProject:
-                        AssignEmployeeToProject();
-                        break;
-
-                    case Command_RemoveEmployeeFromProject:
-                        RemoveEmployeeFromProject();
-                        break;
+                }
+                
+                switch ()
+                {
+                    
+                    
 
                     case Command_Quit:
-                        Console.WriteLine("Thank you for using the project organizer");
+                        Console.WriteLine("Thank you for using the campground system.");
                         return;
 
                     default:
@@ -104,23 +124,59 @@ namespace Capstone.Models
 
                 }
 
-                PrintMenu();
+                PrintFooter();
             }
         }
 
+        private void GetPark_View(int chosenPark)
+        {
+            ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
+            Park park = dal.GetParkInfo(chosenPark);
+            Console.WriteLine(park.Name);
+            PrintInfo("Location", park.Location);
+            PrintInfo("Established", park.EstablishedDate.ToShortDateString());
+            PrintInfo("Area", park.Area.ToString("#,# sq km"));
+            PrintInfo("Annual Visitors", park.AnnualVisitorCount.ToString("#,#"));
+            Console.WriteLine();
+            Console.WriteLine(park.Description);
+        }
 
+        private void GetAllParks_View()
+        {
+            ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
+            this.AllParks = dal.GetAllParks();
 
-        private void PrintHeader(int level)
+            if (this.AllParks.Count > 0)
+            {
+                foreach (Park park in this.AllParks)
+                {
+                    PrintOption(park.Park_Id.ToString(), park.Name);
+                }
+            }
+            else
+            {
+                Console.WriteLine("**** NO RESULTS ****");
+            }
+        }
+        
+        private void PrintOption (string choice, string text)
+        {
+            Console.WriteLine($" {choice} - ".PadRight(8) + text );
+        }
+        
+        private void PrintInfo(string text, string description)
+        {
+            Console.WriteLine($" {text}:".PadRight(15) + description);
+        }
+
+        private void PrintHeader()
         {
             Console.WriteLine("Welcome to our scenic reservation system");
             Console.WriteLine();
-            switch (level)
+            switch (this.Level_Current)
             {
-                case Level_Top:
-                    Console.WriteLine("Select a park for further details");
-                    break;
                 case Level_Parks:
-                    Console.WriteLine("Park information");
+                    Console.WriteLine("Select a park for further details");
                     break;
                 case Level_Campgrounds:
                     Console.WriteLine(" 2 - Show all employees");
@@ -132,11 +188,14 @@ namespace Capstone.Models
                     Console.WriteLine(" 4 - Get employees without projects");
                     break;
             }
-            Console.WriteLine(" Q - Quit");
-            Console.WriteLine();
         }
 
-        private void PrintMenu()
+        private void PrintFooter()
+        {
+            PrintOption("Q", "Quit");
+        }
+
+        private void PrintMenu(int level)
         {
             
 

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Capstone.DAL;
+using Capstone.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace capstone
 {
@@ -6,7 +10,8 @@ namespace capstone
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("WAKE UP!");
+            ProjectCLI cli = new ProjectCLI();
+            cli.RunCLI();
         }
     }
 }
