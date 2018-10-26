@@ -20,7 +20,7 @@ namespace Capstone.Models
         private const string Command_GetParkAvailability = "2";
         private const string Command_BackToParks = "3";
         private const int NoChosenPark = 0;
-        private int ChosenPark = 0;
+        private int ChosenParkID = 0;
 
         // CAMPGROUNDS 
         private const string Level_Campgrounds = "B";
@@ -59,10 +59,10 @@ namespace Capstone.Models
                     this.GetAllParks_View();
 
                     // See which park they want to see
-                    this.ChosenPark = CLIHelper.GetInteger("Which park would you like to visit?");
+                    this.ChosenParkID = CLIHelper.GetInteger("Which park would you like to visit?");
 
                     // see that park
-                    this.GetPark_View(this.ChosenPark);
+                    this.GetPark_View(this.ChosenParkID);
 
                     // Ask what they want to do next
                     this.Park_View_AskNext();
@@ -91,7 +91,7 @@ namespace Capstone.Models
                     // We should always have a chosen park when we get here.
                     // If we don't, kick us back up to parks
                     Console.Clear();
-                    if (this.ChosenPark == NoChosenPark)
+                    if (this.ChosenParkID == NoChosenPark)
                     {
                         Console.WriteLine("Something went wrong.");
                         this.Level_Current = Level_Parks;
@@ -100,7 +100,7 @@ namespace Capstone.Models
                     else
                     {
                         Console.WriteLine("Park Campgrounds");
-                        this.GetAllCampgrounds_View(this.ChosenPark);
+                        this.GetAllCampgrounds_View(this.ChosenParkID);
                         this.Campgrounds_View_AskNext();
                         command = Console.ReadLine();
 
@@ -160,6 +160,54 @@ namespace Capstone.Models
         private void GetParkAvailability_View()
         {
             // ParkAvailability
+            DateTime startDate =  CLIHelper.GetDateTime("What is the arrival date? mm/dd/yyyy");
+            DateTime endDate = CLIHelper.GetDateTime("What is the departure date? mm/dd/yyyy");
+
+            ParkSqlDAL parkDAL = new ParkSqlDAL(DatabaseConnection);
+            IList<Campsite> availableCampsites = parkDAL.ParkAvailability(this.ChosenParkID, startDate, endDate);
+            int lengthOfStay = (int)(endDate - startDate).TotalDays;
+
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL(DatabaseConnection);
+            IList<Campground> campgrounds = campgroundDAL.GetCampgroundsFromPark(this.ChosenParkID);
+            
+            if (availableCampsites.Count > 0)
+            {
+                decimal cost = 0;
+                decimal fee = 0;
+                foreach (Campsite campsite in availableCampsites)
+                {
+                    fee = campgrounds[campground_id].Daily_Fee;
+                    cost = fee * lengthOfStay;
+                    this.PrintCampsiteAvailability(
+                        campgrounds[campsite.Campground_Id].Name,
+                        campsite.Site_Number,
+                        campsite.Max_Occupancy,
+                        campsite.IsAccessible,
+                        campsite.Max_RV_Length,
+                        campsite.HasUtilities,
+                        cost);
+                }
+            }
+            else
+            {
+                Console.WriteLine("**** NO RESULTS ****");
+            }
+        }
+
+        private void PrintCampsiteAvailability(string campgroundName, int site_Id, int max_Occupancy, bool isAccessible, int max_RV_Length, bool hasUtilities, decimal cost)
+        {
+            string acessable = isAccessible ? "Yes" : "No";
+            string rvLength = max_RV_Length > 0 ? max_RV_Length.ToString() : "N/A";
+            string utilities = hasUtilities ? "Yes" : "N/A";
+
+            Console.WriteLine(
+                campgroundName.PadRight(40)
+                + site_Id.ToString().PadRight(15)
+                + max_Occupancy.ToString().PadRight(15)
+                + acessable.PadRight(15)
+                + rvLength.PadRight(15)
+                + utilities.PadRight(15)
+                + cost.ToString("C").PadLeft(20));
         }
 
         private void Park_View_AskNext()
