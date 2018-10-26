@@ -23,6 +23,7 @@ namespace Capstone.Models
 
                 Console.Write(message + " ");
                 userInput = Console.ReadLine();
+                CheckQuit(userInput);
                 numberOfAttempts++;
             }
             while (!DateTime.TryParse(userInput, out dateValue));
@@ -45,6 +46,8 @@ namespace Capstone.Models
 
                 Console.Write(message + " ");
                 userInput = Console.ReadLine();
+                Console.Write(userInput);
+                CheckQuit(userInput);
                 numberOfAttempts++;
             }
             while (!int.TryParse(userInput, out intValue));
@@ -53,6 +56,14 @@ namespace Capstone.Models
 
         }
 
+        private static void CheckQuit(string userInput)
+        {
+            if (userInput.ToUpper() == "q")
+            {
+                Console.WriteLine("Thank you for using the campground system.");
+                Environment.Exit(0);
+            }
+        }
 
         public static double GetDouble(string message)
         {
@@ -69,6 +80,7 @@ namespace Capstone.Models
 
                 Console.Write(message + " ");
                 userInput = Console.ReadLine();
+                CheckQuit(userInput);
                 numberOfAttempts++;
             }
             while (!double.TryParse(userInput, out doubleValue));
@@ -92,6 +104,7 @@ namespace Capstone.Models
 
                 Console.Write(message + " ");
                 userInput = Console.ReadLine();
+                CheckQuit(userInput);
                 numberOfAttempts++;
             }
             while (!bool.TryParse(userInput, out boolValue));
@@ -113,6 +126,7 @@ namespace Capstone.Models
 
                 Console.Write(message + " ");
                 userInput = Console.ReadLine();
+                CheckQuit(userInput);
                 numberOfAttempts++;
             }
             while (String.IsNullOrEmpty(userInput));

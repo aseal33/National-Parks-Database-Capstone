@@ -44,101 +44,48 @@ namespace Capstone.Models
 
         private string Level_Current;
 
-        public void LevelMaster()
-        {
-            // We start off on the parks level
-            Level_Current = Level_Parks;
-
-            do
-            {
-                // Which level are we on of the system?
-                switch (Level_Current)
-                {
-                    case Level_Parks:
-
-                        break;
-                    case Level_Campgrounds:
-
-                        break;
-                    case Level_Campground:
-
-                        break;
-                    case Level_Reservation:
-
-                        break;
-                    case Command_Quit:
-                        Console.WriteLine("Thank you for using the campground system.");
-                        return;
-                }
-                string command = Console.ReadLine();
-            } while (true);
-        }
-
-
         public void RunCLI()
         {
             Level_Current = Level_Parks;
             string command;
+
             while (true)
             {
-                PrintHeader();
-
                 if (Level_Current == Level_Parks)
                 {
+                    PrintHeader();
                     GetAllParks_View();
+                    
+                    // See which park they want to see
                     int chosenPark = CLIHelper.GetInteger("Which park would you like to visit?");
-                    Console.Clear();
+
+                    // see that park
                     GetPark_View(chosenPark);
-                    Console.WriteLine("Select a Command:");
-                    PrintOption("1", "View Campgrounds");
-                    PrintOption("2", "Search for a Reservation.");
-                    PrintOption("3", "Return to previous screen.");
+
+                    // Ask what they want to do next
+                    Park_View_AskNext();
                     command = Console.ReadLine();
-                    switch(command)
+
+                    switch (command)
                     {
                         case Command_GetAllCampgroundsFromPark:
-
-                            break;
+                            Level_Current = Level_Campgrounds;
+                            continue;
                         case Command_GetCampgroundAvailability:
-
-                            break;
+                            Level_Current = Level_Campground;
+                            continue;
                         case "3":
                             Level_Current = Level_Parks;
                             continue;
                     }
 
+                    if(Level_Current == Level_Campgrounds)
+                    {
+                        PrintHeader();
+
+                    }
                 }
-                
-                //switch ()
-                //{
-                    
-                    
-
-                //    case Command_Quit:
-                //        Console.WriteLine("Thank you for using the campground system.");
-                //        return;
-
-                //    default:
-                //        Console.WriteLine("The command provided was not a valid command, please try again.");
-                //        break;
-
-                //}
-
-                PrintFooter();
             }
-        }
-
-        private void GetPark_View(int chosenPark)
-        {
-            ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
-            Park park = dal.GetParkInfo(chosenPark);
-            Console.WriteLine(park.Name);
-            PrintInfo("Location", park.Location);
-            PrintInfo("Established", park.EstablishedDate.ToShortDateString());
-            PrintInfo("Area", park.Area.ToString("#,# sq km"));
-            PrintInfo("Annual Visitors", park.AnnualVisitorCount.ToString("#,#"));
-            Console.WriteLine();
-            Console.WriteLine(park.Description);
         }
 
         private void GetAllParks_View()
@@ -158,6 +105,30 @@ namespace Capstone.Models
                 Console.WriteLine("**** NO RESULTS ****");
             }
         }
+
+        private void GetPark_View(int chosenPark)
+        {
+            Console.Clear();
+            ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
+            Park park = dal.GetParkInfo(chosenPark);
+            Console.WriteLine(park.Name);
+            PrintInfo("Location", park.Location);
+            PrintInfo("Established", park.EstablishedDate.ToShortDateString());
+            PrintInfo("Area", park.Area.ToString("#,# sq km"));
+            PrintInfo("Annual Visitors", park.AnnualVisitorCount.ToString("#,#"));
+            Console.WriteLine();
+            Console.WriteLine(park.Description);
+            Console.WriteLine();
+        }
+
+        private void Park_View_AskNext()
+        {
+            Console.WriteLine("Select a Command:");
+            PrintOption("1", "View Campgrounds");
+            PrintOption("2", "Search for a Reservation.");
+            PrintOption("3", "Return to previous screen.");
+        }
+
         
         private void PrintOption (string choice, string text)
         {
@@ -166,11 +137,12 @@ namespace Capstone.Models
         
         private void PrintInfo(string text, string description)
         {
-            Console.WriteLine($" {text}:".PadRight(15) + description);
+            Console.WriteLine($" {text}:".PadRight(20) + description);
         }
 
         private void PrintHeader()
         {
+            Console.Clear();
             Console.WriteLine("Welcome to our scenic reservation system");
             Console.WriteLine();
             switch (this.Level_Current)
@@ -179,7 +151,7 @@ namespace Capstone.Models
                     Console.WriteLine("Select a park for further details");
                     break;
                 case Level_Campgrounds:
-                    Console.WriteLine(" 2 - Show all employees");
+                    Console.WriteLine("Park Campgrounds");
                     break;
                 case Level_Campground:
                     Console.WriteLine(" 3 - Employee search by first and last name");
