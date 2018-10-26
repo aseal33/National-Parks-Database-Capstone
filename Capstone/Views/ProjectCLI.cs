@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Capstone.Models
 {
@@ -48,6 +49,7 @@ namespace Capstone.Models
             this.Level_Current = Level_Parks;
             string command;
 
+            // THE LEVEL MASTER ///////////////////////////////////////////
             while (true)
             {
                 // LEVEL: PARKS ///////////////////////////////////////////////
@@ -75,11 +77,12 @@ namespace Capstone.Models
                             continue;
                         case Command_GetParkAvailability:
                             this.GetParkAvailability_View();
-                            this.Level_Current = Level_Parks;
+                            Console.ReadLine();
                             continue;
                         case Command_BackToParks:
                             this.Level_Current = Level_Parks;
-                            continue;
+                            Console.ReadLine();
+                            break;
                         default:
                             return;
                     }
@@ -93,7 +96,6 @@ namespace Capstone.Models
                     Console.Clear();
                     if (this.ChosenParkID == NoChosenPark)
                     {
-                        Console.WriteLine("Something went wrong.");
                         this.Level_Current = Level_Parks;
                         continue;
                     }
@@ -110,7 +112,8 @@ namespace Capstone.Models
                                 this.Level_Current = Level_Campground;
                                 continue;
                             case Command_GetCampsitesFromCampground:
-                                
+
+                                continue;
                             default:
                                 return;
                         }
@@ -160,7 +163,7 @@ namespace Capstone.Models
         private void GetParkAvailability_View()
         {
             // ParkAvailability
-            DateTime startDate =  CLIHelper.GetDateTime("What is the arrival date? mm/dd/yyyy");
+            DateTime startDate = CLIHelper.GetDateTime("What is the arrival date? mm/dd/yyyy");
             DateTime endDate = CLIHelper.GetDateTime("What is the departure date? mm/dd/yyyy");
 
             ParkSqlDAL parkDAL = new ParkSqlDAL(DatabaseConnection);
@@ -168,6 +171,42 @@ namespace Capstone.Models
             int lengthOfStay = (int)(endDate - startDate).TotalDays;
 
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL(DatabaseConnection);
+<<<<<<< HEAD
+            IList<Campground> campgroundsList = campgroundDAL.GetCampgroundsFromPark(this.ChosenParkID);
+            Dictionary<int, Campground> campgroundDict = this.ListToDict(campgroundsList);
+
+            if (availableCampsites.Count > 0)
+            {
+                decimal cost = 0;
+                decimal fee = 0;
+                Console.WriteLine(
+                    "Campground".PadRight(30)
+                    + "Site No.".PadRight(15)
+                    + "Max Occup.".ToString().PadRight(15)
+                    + "Accessible".PadRight(15)
+                    + "RV Len".PadRight(15)
+                    + "Utility".PadRight(15)
+                    + "Cost".PadLeft(20));
+
+                foreach (Campsite campsite in availableCampsites)
+                {
+                    fee = campgroundDict[campsite.Campground_Id].Daily_Fee;
+                    cost = fee * lengthOfStay;
+                    this.PrintCampsiteAvailability(
+                        campgroundDict[campsite.Campground_Id].Name,
+                        campsite.Site_Number,
+                        campsite.Max_Occupancy,
+                        campsite.IsAccessible,
+                        campsite.Max_RV_Length,
+                        campsite.HasUtilities,
+                        cost);
+                }
+            }
+            else
+            {
+                Console.WriteLine("**** NO RESULTS ****");
+            }
+=======
             IList<Campground> campgrounds = campgroundDAL.GetCampgroundsFromPark(this.ChosenParkID);
             
             //if (availableCampsites.Count > 0)
@@ -192,6 +231,19 @@ namespace Capstone.Models
             //{
             //    Console.WriteLine("**** NO RESULTS ****");
             //}
+>>>>>>> 2e1a5c484ce8f40cd19d60864165190de89b3e1f
+        }
+
+        private Dictionary<int, Campground> ListToDict(IList<Campground> campgroundsList)
+        {
+            Dictionary<int, Campground> output = new Dictionary<int, Campground>();
+
+            foreach (Campground campground in campgroundsList)
+            {
+                output.Add(campground.Campground_Id, campground);
+            }
+
+            return output;
         }
 
         private void PrintCampsiteAvailability(string campgroundName, int site_Id, int max_Occupancy, bool isAccessible, int max_RV_Length, bool hasUtilities, decimal cost)
@@ -201,7 +253,7 @@ namespace Capstone.Models
             string utilities = hasUtilities ? "Yes" : "N/A";
 
             Console.WriteLine(
-                campgroundName.PadRight(40)
+                campgroundName.PadRight(30)
                 + site_Id.ToString().PadRight(15)
                 + max_Occupancy.ToString().PadRight(15)
                 + acessable.PadRight(15)
@@ -259,9 +311,9 @@ namespace Capstone.Models
         }
 
         // Pretty Printing
-        private void PrintOption (string choice, string text)
+        private void PrintOption(string choice, string text)
         {
-            Console.WriteLine($" {choice} - ".PadRight(8) + text );
+            Console.WriteLine($" {choice} - ".PadRight(8) + text);
         }
 
         private void PrintInfo(string text, string description)
