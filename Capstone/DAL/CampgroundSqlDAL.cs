@@ -52,7 +52,7 @@ namespace Capstone.DAL
             return output;
         }
 
-        public IList<Campsite> CampgroundAvailability(Campground campgroundToBook, DateTime start_date, DateTime end_date)
+        public IList<Campsite> CampgroundAvailability(int campground_Id, DateTime start_date, DateTime end_date)
         {
             List<Campsite> output = new List<Campsite>();
             try
@@ -60,6 +60,18 @@ namespace Capstone.DAL
                 using (SqlConnection conn = new SqlConnection(this.ConnectionString))
                 {
                     conn.Open();
+                    SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground_id = {campground_Id};");
+                    SqlDataReader read = command.ExecuteReader();
+                    Campground campgroundToBook = new Campground();
+                    while (read.Read())
+                    {
+                        campgroundToBook.Campground_Id = Convert.ToInt32(read["campground_id"]);
+                        campgroundToBook.Park_Id = Convert.ToInt32(read["park_id"]);
+                        campgroundToBook.Name = Convert.ToString(read["name"]);
+                        campgroundToBook.Opening_Month = Convert.ToInt32(read["open_from_mm"]);
+                        campgroundToBook.Closing_Month = Convert.ToInt32(read["open_to_mm"]);
+                        campgroundToBook.Daily_Fee = Convert.ToDecimal(read["daily_fee"]);
+                    }
 
                     if (start_date.Month < campgroundToBook.Opening_Month || end_date.Month > campgroundToBook.Closing_Month)
                     {

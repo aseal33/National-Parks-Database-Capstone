@@ -82,7 +82,7 @@ namespace Capstone.DAL
             }
         }
 
-        public IList<Campsite> ParkAvailability(Park parkToBook, DateTime start_date, DateTime end_date)
+        public IList<Campsite> ParkAvailability(int park_Id, DateTime start_date, DateTime end_date)
         {
             List<Campsite> output = new List<Campsite>();
             try
@@ -91,7 +91,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground.park_id = {parkToBook.Park_Id}");
+                    SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground.park_id = {park_Id}");
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
