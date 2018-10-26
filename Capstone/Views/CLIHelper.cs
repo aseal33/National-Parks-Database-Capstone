@@ -10,7 +10,7 @@ namespace Capstone.Models
     {
         public static DateTime GetDateTime(string message)
         {
-            string userInput = String.Empty;
+            string userInput = string.Empty;
             DateTime dateValue = DateTime.MinValue;
             int numberOfAttempts = 0;
 
@@ -53,16 +53,6 @@ namespace Capstone.Models
             while (!int.TryParse(userInput, out intValue));
 
             return intValue;
-
-        }
-
-        private static void CheckQuit(string userInput)
-        {
-            if (userInput.ToUpper() == "q")
-            {
-                Console.WriteLine("Thank you for using the campground system.");
-                Environment.Exit(0);
-            }
         }
 
         public static double GetDouble(string message)
@@ -131,6 +121,15 @@ namespace Capstone.Models
             while (string.IsNullOrEmpty(userInput));
 
             return userInput;
+        }
+
+        private static void CheckQuit(string userInput)
+        {
+            if (userInput.ToUpper() == "q")
+            {
+                Console.WriteLine("Thank you for using the campground system.");
+                Environment.Exit(0);
+            }
         }
     }
 }

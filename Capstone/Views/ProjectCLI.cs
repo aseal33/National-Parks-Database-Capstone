@@ -1,7 +1,7 @@
 ﻿using Capstone.DAL;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 
 namespace Capstone.Models
 {
@@ -13,30 +13,33 @@ namespace Capstone.Models
         // reserve campsite - changing
 
         // PARKS
-        public IList<Park> AllParks;
-        //const string Level_Top = "P1";
-        const string Level_Parks = "A";
-        const string Command_GetAllParks = "1"; // in park // park id and park name 
-        const string Command_GetParkInfo = "2"; // in park // returns park - give int park id
+        private IList<Park> AllParks;
+        private const string Level_Parks = "A";
+        private const string Command_GetAllParks = "1"; // in park // park id and park name 
+        // private const string Command_GetParkInfo = "2"; // in park // returns park - give int park id
+        private const string Command_GetParkAvailability = "2";
+        private const string Command_BackToParks = "3";
+        private const int NoChosenPark = 0;
+        private int ChosenPark = 0;
 
         // CAMPGROUNDS 
-        const string Level_Campgrounds = "B";
-        const string Command_GetAllCampgroundsFromPark = "1"; // in campground 
-        const string Command_GetCampgroundAvailability = "2"; // in campground
+        private const string Level_Campgrounds = "B";
+        private const string Command_GetAllCampgroundsFromPark = "1"; // in campground
 
         // CAMPGROUND
-        const string Level_Campground = "C";
-        const string Command_GetCampsitesFromCampground = "1"; // in campsite
-        const string Command_ChooseCampground = "2";
-        const string Command_BackToCampgrounds = "3";
+        private const string Level_Campground = "C";
+        private const string Command_GetCampgroundAvailability = "1"; // in campground
+        private const string Command_GetCampsitesFromCampground = "2"; // in campsite
+        //private const string Command_ChooseCampground = "2";
+        private const string Command_BackToCampgrounds = "3";
 
         // RESERVATION
-        const string Level_Reservation = "D";
-        const string Command_ChooseCampsite = "1";
-        const string Command_ReserveCampsite = "2";
+        private const string Level_Reservation = "D";
+        private const string Command_ChooseCampsite = "1";
+        private const string Command_ReserveCampsite = "2";
 
-        const string Command_Quit = "Q";
-        const string DatabaseConnection = @"Data Source =.\sqlexpress;Initial Catalog = NPCampsite; Integrated Security = True";
+        private const string Command_Quit = "Q";
+        public const string DatabaseConnection = @"Data Source =.\sqlexpress;Initial Catalog = NPCampsite; Integrated Security = True";
 
         private string Level_Current;
 
@@ -47,16 +50,19 @@ namespace Capstone.Models
 
             while (true)
             {
+                // LEVEL: PARKS ///////////////////////////////////////////////
                 if (this.Level_Current == Level_Parks)
                 {
-                    this.PrintHeader();
+                    Console.Clear();
+                    Console.WriteLine("Welcome to our scenic reservation system");
+                    Console.WriteLine("Select a park for further details");
                     this.GetAllParks_View();
 
                     // See which park they want to see
-                    int chosenPark = CLIHelper.GetInteger("Which park would you like to visit?");
+                    this.ChosenPark = CLIHelper.GetInteger("Which park would you like to visit?");
 
                     // see that park
-                    this.GetPark_View(chosenPark);
+                    this.GetPark_View(this.ChosenPark);
 
                     // Ask what they want to do next
                     this.Park_View_AskNext();
@@ -67,23 +73,57 @@ namespace Capstone.Models
                         case Command_GetAllCampgroundsFromPark:
                             this.Level_Current = Level_Campgrounds;
                             continue;
-                        case Command_GetCampgroundAvailability:
-                            this.Level_Current = Level_Campground;
-                            continue;
-                        case "3":
+                        case Command_GetParkAvailability:
+                            this.GetParkAvailability_View();
                             this.Level_Current = Level_Parks;
                             continue;
+                        case Command_BackToParks:
+                            this.Level_Current = Level_Parks;
+                            continue;
+                        default:
+                            return;
                     }
+                }
 
-                    if(this.Level_Current == Level_Campgrounds)
+                // LEVEL: CAMPGROUNDS /////////////////////////////////////////
+                if (this.Level_Current == Level_Campgrounds)
+                {
+                    // We should always have a chosen park when we get here.
+                    // If we don't, kick us back up to parks
+                    Console.Clear();
+                    if (this.ChosenPark == NoChosenPark)
                     {
-                        this.PrintHeader();
-
+                        Console.WriteLine("Something went wrong.");
+                        this.Level_Current = Level_Parks;
+                        continue;
                     }
+                    else
+                    {
+                        Console.WriteLine("Park Campgrounds");
+                        this.GetAllCampgrounds_View(this.ChosenPark);
+                        this.Campgrounds_View_AskNext();
+                        command = Console.ReadLine();
+
+                        switch (command)
+                        {
+                            case Command_GetCampgroundAvailability:
+                                this.Level_Current = Level_Campground;
+                                continue;
+                            case Command_GetCampsitesFromCampground:
+                                
+                            default:
+                                return;
+                        }
+                    }
+                }
+                else
+                {
+                    return;
                 }
             }
         }
 
+        // LEVEL: PARKS ///////////////////////////////////////////////
         private void GetAllParks_View()
         {
             ParkSqlDAL dal = new ParkSqlDAL(DatabaseConnection);
@@ -117,14 +157,60 @@ namespace Capstone.Models
             Console.WriteLine();
         }
 
+        private void GetParkAvailability_View()
+        {
+            // ParkAvailability
+        }
+
         private void Park_View_AskNext()
         {
             Console.WriteLine("Select a Command:");
-            this.PrintOption("1", "View Campgrounds");
-            this.PrintOption("2", "Search for a Reservation.");
+            this.PrintOption(Command_GetAllCampgroundsFromPark, "View Campgrounds");
+            this.PrintOption(Command_GetParkAvailability, "Search for a Reservation.");
+            this.PrintOption(Command_BackToParks, "Return to previous screen.");
+        }
+
+        // LEVEL: CAMPGROUNDS /////////////////////////////////////////
+        private void GetAllCampgrounds_View(int parkID)
+        {
+            CampgroundSqlDAL dal = new CampgroundSqlDAL(DatabaseConnection);
+            Console.WriteLine(
+                " ".PadRight(10)
+                + "Name".PadRight(40)
+                + "Open".PadRight(15)
+                + "Close".PadRight(15)
+                + "Daily Fee".PadLeft(15));
+
+            IList<Campground> campgrounds = dal.GetCampgroundsFromPark(parkID);
+
+            if (campgrounds.Count > 0)
+            {
+                foreach (Campground campground in campgrounds)
+                {
+                    this.PrintCampground(campground.Campground_Id, campground.Name, campground.Opening_Month, campground.Closing_Month, campground.Daily_Fee);
+                }
+            }
+            else
+            {
+                Console.WriteLine("**** NO RESULTS ****");
+            }
+        }
+
+        private void Campgrounds_View_AskNext()
+        {
+            Console.WriteLine("Select a Command:");
+            //this.PrintOption("1", "Print campground info again.");
+            this.PrintOption("2", "Search for sites available to reserve.");
             this.PrintOption("3", "Return to previous screen.");
         }
 
+        // Campground
+        private void GetCampgroundAvailability_View()
+        {
+
+        }
+
+        // Pretty Printing
         private void PrintOption (string choice, string text)
         {
             Console.WriteLine($" {choice} - ".PadRight(8) + text );
@@ -135,26 +221,16 @@ namespace Capstone.Models
             Console.WriteLine($" {text}:".PadRight(20) + description);
         }
 
-        private void PrintHeader()
+        private void PrintCampground(int id, string name, int open, int close, decimal daily_fee)
         {
-            Console.Clear();
-            Console.WriteLine("Welcome to our scenic reservation system");
-            Console.WriteLine();
-            switch (this.Level_Current)
-            {
-                case Level_Parks:
-                    Console.WriteLine("Select a park for further details");
-                    break;
-                case Level_Campgrounds:
-                    Console.WriteLine("Park Campgrounds");
-                    break;
-                case Level_Campground:
-                    Console.WriteLine(" 3 - Employee search by first and last name");
-                    break;
-                case Level_Reservation:
-                    Console.WriteLine(" 4 - Get employees without projects");
-                    break;
-            }
+            string openMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(open);
+            string closeMonth = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(close);
+            Console.WriteLine(
+                $" #{id}:".PadRight(10)
+                + name.PadRight(40)
+                + openMonth.PadRight(15)
+                + closeMonth.PadRight(15)
+                + daily_fee.ToString("C").PadLeft(15));
         }
 
         private void PrintFooter()
