@@ -9,7 +9,7 @@ namespace Capstone.Tests
     [TestClass]
     public class ParkDB_Tests
     {
-        public const string ConnectionString = @"Data Source=.\SQLEXPRESS; Initial Catalog=Capstone; Integrated Security=True";
+        public const string ConnectionString = @"Data Source=.\SQLEXPRESS; Initial Catalog=NPCampsite; Integrated Security=True";
         TransactionScope transaction;
 
         [TestInitialize]
