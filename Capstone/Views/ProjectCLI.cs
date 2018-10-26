@@ -29,10 +29,10 @@ namespace Capstone.Models
 
         // CAMPGROUND
         private const string Level_Campground = "C";
-        private const string Command_GetCampgroundAvailability = "1"; // in campground
-        private const string Command_GetCampsitesFromCampground = "2"; // in campsite
+        //private const string Command_GetCampgroundAvailability = "1"; // in campground
+        private const string Command_GetCampsitesFromCampground = "1"; // in campsite
         //private const string Command_ChooseCampground = "2";
-        private const string Command_BackToCampgrounds = "3";
+        private const string Command_BackToCampgrounds = "2";
 
         // RESERVATION
         private const string Level_Reservation = "D";
@@ -108,11 +108,11 @@ namespace Capstone.Models
 
                         switch (command)
                         {
-                            case Command_GetCampgroundAvailability:
+                            case Command_GetCampsitesFromCampground:
                                 this.Level_Current = Level_Campground;
                                 continue;
-                            case Command_GetCampsitesFromCampground:
-
+                            case Command_BackToCampgrounds:
+                                this.Level_Current = Level_Campground;
                                 continue;
                             default:
                                 return;
@@ -171,7 +171,7 @@ namespace Capstone.Models
             int lengthOfStay = (int)(endDate - startDate).TotalDays;
 
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL(DatabaseConnection);
-<<<<<<< HEAD
+
             IList<Campground> campgroundsList = campgroundDAL.GetCampgroundsFromPark(this.ChosenParkID);
             Dictionary<int, Campground> campgroundDict = this.ListToDict(campgroundsList);
 
@@ -206,32 +206,6 @@ namespace Capstone.Models
             {
                 Console.WriteLine("**** NO RESULTS ****");
             }
-=======
-            IList<Campground> campgrounds = campgroundDAL.GetCampgroundsFromPark(this.ChosenParkID);
-            
-            //if (availableCampsites.Count > 0)
-            //{
-            //    decimal cost = 0;
-            //    decimal fee = 0;
-            //    foreach (Campsite campsite in availableCampsites)
-            //    {
-            //        fee = campgrounds[campground_id].Daily_Fee;
-            //        cost = fee * lengthOfStay;
-            //        this.PrintCampsiteAvailability(
-            //            campgrounds[campsite.Campground_Id].Name,
-            //            campsite.Site_Number,
-            //            campsite.Max_Occupancy,
-            //            campsite.IsAccessible,
-            //            campsite.Max_RV_Length,
-            //            campsite.HasUtilities,
-            //            cost);
-            //    }
-            //}
-            //else
-            //{
-            //    Console.WriteLine("**** NO RESULTS ****");
-            //}
->>>>>>> 2e1a5c484ce8f40cd19d60864165190de89b3e1f
         }
 
         private Dictionary<int, Campground> ListToDict(IList<Campground> campgroundsList)
@@ -299,15 +273,56 @@ namespace Capstone.Models
         private void Campgrounds_View_AskNext()
         {
             Console.WriteLine("Select a Command:");
-            //this.PrintOption("1", "Print campground info again.");
-            this.PrintOption("2", "Search for sites available to reserve.");
-            this.PrintOption("3", "Return to previous screen.");
+            this.PrintOption(Command_GetCampsitesFromCampground, "Search for sites available to reserve.");
+            this.PrintOption(Command_BackToCampgrounds, "Return to previous screen.");
         }
 
         // Campground
         private void GetCampgroundAvailability_View()
         {
+            DateTime startDate = CLIHelper.GetDateTime("What is the arrival date? mm/dd/yyyy");
+            DateTime endDate = CLIHelper.GetDateTime("What is the departure date? mm/dd/yyyy");
 
+            CampgroundSqlDAL campDAL = new CampgroundSqlDAL(DatabaseConnection);
+            IList<Campsite> availableCampsites = campDAL.CampgroundAvailability(this.ChosenParkID, startDate, endDate);
+            int lengthOfStay = (int)(endDate - startDate).TotalDays;
+
+            CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL(DatabaseConnection);
+
+            IList<Campground> campgroundsList = campgroundDAL.GetCampgroundsFromPark(this.ChosenParkID);
+            Dictionary<int, Campground> campgroundDict = this.ListToDict(campgroundsList);
+
+            if (availableCampsites.Count > 0)
+            {
+                decimal cost = 0;
+                decimal fee = 0;
+                Console.WriteLine(
+                    "Campground".PadRight(30)
+                    + "Site No.".PadRight(15)
+                    + "Max Occup.".ToString().PadRight(15)
+                    + "Accessible".PadRight(15)
+                    + "RV Len".PadRight(15)
+                    + "Utility".PadRight(15)
+                    + "Cost".PadLeft(20));
+
+                foreach (Campsite campsite in availableCampsites)
+                {
+                    fee = campgroundDict[campsite.Campground_Id].Daily_Fee;
+                    cost = fee * lengthOfStay;
+                    this.PrintCampsiteAvailability(
+                        campgroundDict[campsite.Campground_Id].Name,
+                        campsite.Site_Number,
+                        campsite.Max_Occupancy,
+                        campsite.IsAccessible,
+                        campsite.Max_RV_Length,
+                        campsite.HasUtilities,
+                        cost);
+                }
+            }
+            else
+            {
+                Console.WriteLine("**** NO RESULTS ****");
+            }
         }
 
         // Pretty Printing
@@ -337,11 +352,5 @@ namespace Capstone.Models
         {
             this.PrintOption("Q", "Quit");
         }
-
-        private void PrintMenu(int level)
-        {
-
-        }
-
     }
 }
