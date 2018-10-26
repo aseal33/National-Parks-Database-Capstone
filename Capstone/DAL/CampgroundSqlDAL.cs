@@ -17,7 +17,7 @@ namespace Capstone.DAL
             this.ConnectionString = connectionString;
         }
 
-        public IList<Campground> GetCampgroundsFromPark(Park newPark)
+        public IList<Campground> GetCampgroundsFromPark(int park_Id)
         {
             List<Campground> output = new List<Campground>();
             try
@@ -26,7 +26,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    string query = $"SELECT * FROM campground WHERE campground.park_id = {newPark.Park_Id}";
+                    string query = $"SELECT * FROM campground WHERE campground.park_id = {park_Id}";
 
                     SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -67,13 +67,15 @@ namespace Capstone.DAL
                         return output;
                     }
 
-                    string query = "SELECT site_id FROM site " +
+                    string query = "SELECT site.site_id, campground.daily_fee FROM site INNER JOIN campground " +
+                        "ON campground.campground_id = site.campground_id WHERE site.site_id IN (SELECT site_id FROM site " +
                         $"WHERE campground_id = {campgroundToBook.Campground_Id} " +
                         "EXCEPT " +
                         "SELECT reservation.site_id FROM reservation " +
                         "INNER JOIN site ON site.site_id = reservation.site_id " +
                         $"WHERE campground_id = {campgroundToBook.Campground_Id} AND ((to_date BETWEEN \'{start_date}\' AND \'{end_date}\') " +
-                        $"OR (from_date BETWEEN \'{start_date}\' AND \'{end_date}\') OR ((to_date >= '{start_date}') AND (from_date <= '{end_date}')))";
+                        $"OR (from_date BETWEEN \'{start_date}\' AND \'{end_date}\') OR " +
+                        $"((to_date >= '{start_date}') AND (from_date <= '{end_date}')))";
                     SqlCommand cmd = new SqlCommand(query, conn);
                     SqlDataReader reader = cmd.ExecuteReader();
 
