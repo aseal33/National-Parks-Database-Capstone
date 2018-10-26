@@ -12,6 +12,11 @@ namespace Capstone.Tests
         public const string ConnectionString = @"Data Source=.\SQLEXPRESS; Initial Catalog=NPCampsite; Integrated Security=True";
         TransactionScope transaction;
 
+        public int ParkId;
+        public int CampgroundId;
+        public int CampsiteId;
+        public int ReservationId;
+
         [TestInitialize]
         public void Initialize()
         {
@@ -26,7 +31,16 @@ namespace Capstone.Tests
             {
                 conn.Open();
                 SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.ExecuteNonQuery();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.Read())
+                {
+                    ParkId = Convert.ToInt32(reader["park"]);
+                    CampgroundId = Convert.ToInt32(reader["campground"]);
+                    CampsiteId = Convert.ToInt32(reader["campsite"]);
+                    ReservationId = Convert.ToInt32(reader["reservation"]);
+                }
             }
         }
 

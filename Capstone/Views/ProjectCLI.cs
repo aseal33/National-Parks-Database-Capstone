@@ -170,28 +170,28 @@ namespace Capstone.Models
             CampgroundSqlDAL campgroundDAL = new CampgroundSqlDAL(DatabaseConnection);
             IList<Campground> campgrounds = campgroundDAL.GetCampgroundsFromPark(this.ChosenParkID);
             
-            if (availableCampsites.Count > 0)
-            {
-                decimal cost = 0;
-                decimal fee = 0;
-                foreach (Campsite campsite in availableCampsites)
-                {
-                    fee = campgrounds[campground_id].Daily_Fee;
-                    cost = fee * lengthOfStay;
-                    this.PrintCampsiteAvailability(
-                        campgrounds[campsite.Campground_Id].Name,
-                        campsite.Site_Number,
-                        campsite.Max_Occupancy,
-                        campsite.IsAccessible,
-                        campsite.Max_RV_Length,
-                        campsite.HasUtilities,
-                        cost);
-                }
-            }
-            else
-            {
-                Console.WriteLine("**** NO RESULTS ****");
-            }
+            //if (availableCampsites.Count > 0)
+            //{
+            //    decimal cost = 0;
+            //    decimal fee = 0;
+            //    foreach (Campsite campsite in availableCampsites)
+            //    {
+            //        fee = campgrounds[campground_id].Daily_Fee;
+            //        cost = fee * lengthOfStay;
+            //        this.PrintCampsiteAvailability(
+            //            campgrounds[campsite.Campground_Id].Name,
+            //            campsite.Site_Number,
+            //            campsite.Max_Occupancy,
+            //            campsite.IsAccessible,
+            //            campsite.Max_RV_Length,
+            //            campsite.HasUtilities,
+            //            cost);
+            //    }
+            //}
+            //else
+            //{
+            //    Console.WriteLine("**** NO RESULTS ****");
+            //}
         }
 
         private void PrintCampsiteAvailability(string campgroundName, int site_Id, int max_Occupancy, bool isAccessible, int max_RV_Length, bool hasUtilities, decimal cost)

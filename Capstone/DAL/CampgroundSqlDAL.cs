@@ -52,7 +52,7 @@ namespace Capstone.DAL
             return output;
         }
 
-        public IList<Campsite> CampgroundAvailability(int campground_Id, DateTime start_date, DateTime end_date)
+        public IList<Campsite> CampgroundAvailability(int campground_Id, DateTime startDate, DateTime endDate)
         {
             List<Campsite> output = new List<Campsite>();
             try
@@ -60,7 +60,7 @@ namespace Capstone.DAL
                 using (SqlConnection conn = new SqlConnection(this.ConnectionString))
                 {
                     conn.Open();
-                    SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground_id = {campground_Id};");
+                    SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground_id = {campground_Id};", conn);
                     SqlDataReader read = command.ExecuteReader();
                     Campground campgroundToBook = new Campground();
                     while (read.Read())
@@ -73,22 +73,47 @@ namespace Capstone.DAL
                         campgroundToBook.Daily_Fee = Convert.ToDecimal(read["daily_fee"]);
                     }
 
-                    if (start_date.Month < campgroundToBook.Opening_Month || end_date.Month > campgroundToBook.Closing_Month)
+                    read.Close();
+
+                    if (startDate.Month < campgroundToBook.Opening_Month || endDate.Month > campgroundToBook.Closing_Month)
                     {
                         Console.WriteLine("GO AWAY! WE CLOSED!!!!");
                         return output;
                     }
 
-                    string query = "SELECT * FROM site INNER JOIN campground " +
-                        "ON campground.campground_id = site.campground_id WHERE site.site_id IN (SELECT site_id FROM site " +
-                        $"WHERE campground_id = {campgroundToBook.Campground_Id} " +
-                        "EXCEPT " +
-                        "SELECT reservation.site_id FROM reservation " +
-                        "INNER JOIN site ON site.site_id = reservation.site_id " +
-                        $"WHERE campground_id = {campgroundToBook.Campground_Id} AND ((to_date BETWEEN \'{start_date}\' AND \'{end_date}\') " +
-                        $"OR (from_date BETWEEN \'{start_date}\' AND \'{end_date}\') OR " +
-                        $"((to_date >= '{start_date}') AND (from_date <= '{end_date}')))";
+                    //string query = "SELECT * FROM site INNER JOIN campground " +
+                    //    "ON campground.campground_id = site.campground_id WHERE site.site_id IN (SELECT site_id FROM site " +
+                    //    $"WHERE campground_id = {campground_Id} " +
+                    //    "EXCEPT " +
+                    //    "SELECT site.site_id FROM reservation " +
+                    //    "INNER JOIN site ON site.site_id = reservation.site_id " +
+                    //    $"WHERE campground_id = {campground_Id} AND ((to_date BETWEEN \'{start_date}\' AND \'{end_date}\') " +
+                    //    $"OR (from_date BETWEEN \'{start_date}\' AND \'{end_date}\') OR " +
+                    //    $"((from_date >= '{end_date}') AND (to_date <= '{start_date}'))))";
+
+
+                    //string start_date = string.Empty + startDate.Year + startDate.Month + startDate.Day;
+                    //string end_date = string.Empty + endDate.Year + endDate.Month + endDate.Day;
+
+                    string query = $" SELECT * FROM site "
+                    + $" INNER JOIN campground ON "
+                    + $" campground.campground_id = site.campground_id "
+                    + $" WHERE site.site_id IN ("
+                    + $" SELECT site_id FROM site"
+                    + $" WHERE campground_id = {campground_Id}"
+                    + $" EXCEPT"
+                    + $" SELECT site.site_id FROM reservation INNER JOIN site ON site.site_id = reservation.site_id"
+                    + $"	WHERE campground_id = {campground_Id} "
+                    + $"	AND ((to_date BETWEEN @startDate AND @endDate)"
+                    + $"		OR	(from_date BETWEEN @startDate AND @endDate)"
+                    + $"		OR	(from_date >= @endDate AND to_date <= @startDate)))";
+
+
                     SqlCommand cmd = new SqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@startDate", startDate);
+                    cmd.Parameters.AddWithValue("@endDate", endDate);
+
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())

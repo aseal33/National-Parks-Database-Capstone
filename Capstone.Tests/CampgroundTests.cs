@@ -39,35 +39,87 @@ namespace Capstone.Tests
 
         }
         [TestMethod]
-        public void GetAvailability_ReturnsCount()
+        public void GetAvailability_DateIsAvailable()
         {
             // Arrange
             CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
 
-            int iD = 0;
-            DateTime start = new DateTime(0000, 00, 00);
-            DateTime end = new DateTime(0000, 00, 00);
-            using (SqlConnection conn = new SqlConnection(ConnectionString))
-            {
-                conn.Open();
-                SqlCommand command = new SqlCommand($"SELECT * FROM site INNER JOIN campground ON site.campground_id = campground.campground_id INNER JOIN reservation ON site.site_id = reservation.site_id WHERE from_date = '2018-06-30' AND to_date = '2018-07-21'", conn);
-                SqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    iD = Convert.ToInt32(reader["park_id"]);
-                    start = Convert.ToDateTime(reader["from_date"]);
-                    end = Convert.ToDateTime(reader["to_date"]);
-                    
-                }
-            }
-
-            // Act
-            // Campground test = new Campground();
-            IList<Campsite> campsite = dal.CampgroundAvailability(iD, start, end);
+            //int iD = 0;
+            DateTime start = new DateTime(2000, 10, 01);
+            DateTime end = new DateTime(2000, 10, 10);
+           
+            IList<Campsite> campsite = dal.CampgroundAvailability(CampgroundId, start, end);
 
 
             // Assert
             Assert.AreEqual(1, campsite.Count);
         }
+
+        [TestMethod]
+        public void GetAvailability_ReturnsCount1()
+        {       
+            // Arrange
+            CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
+            IList<Campsite> campsite = dal.CampgroundAvailability(CampgroundId, new DateTime(2018, 06, 30), new DateTime(2018, 07, 21));            
+
+            // Assert
+            Assert.AreEqual(1, campsite.Count);
+        }
+
+        [TestMethod]
+        public void GetAvailability_ReturnsCount0()
+        {
+            // Arrange
+            CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
+            IList<Campsite> campsite = dal.CampgroundAvailability(CampgroundId, new DateTime(2018, 07, 28), new DateTime(2018, 07, 30));
+
+            // Assert
+            Assert.AreEqual(0, campsite.Count);
+        }
+
+        [TestMethod]
+        public void GetAvailability_ReturnsCount0Again()
+        {
+            // Arrange
+            CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
+            IList<Campsite> campsite = dal.CampgroundAvailability(CampgroundId, new DateTime(2018, 07, 21), new DateTime(2018, 07, 23));
+
+            // Assert
+            Assert.AreEqual(0, campsite.Count);
+        }
+
+        [TestMethod]
+        public void GetAvailability_ReturnsCount0Again1()
+        {
+            // Arrange
+            CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
+            IList<Campsite> campsite = dal.CampgroundAvailability(CampgroundId, new DateTime(2018, 07, 21), new DateTime(2018, 07, 22));
+
+            // Assert
+            Assert.AreEqual(0, campsite.Count);
+        }
+
+        [TestMethod]
+        public void GetAvailability_ReturnsCount0Again2()
+        {
+            // Arrange
+            CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
+            IList<Campsite> campsite = dal.CampgroundAvailability(CampgroundId, new DateTime(2018, 07, 29), new DateTime(2018, 07, 30));
+
+            // Assert
+            Assert.AreEqual(0, campsite.Count);
+        }
+
+        [TestMethod]
+        public void GetAvailability_ReturnsCount0Again3()
+        {
+            // Arrange
+            CampgroundSqlDAL dal = new CampgroundSqlDAL(ConnectionString);
+            IList<Campsite> campsite = dal.CampgroundAvailability(CampgroundId, new DateTime(2018, 07, 21), new DateTime(2018, 07, 30));
+
+            // Assert
+            Assert.AreEqual(0, campsite.Count);
+        }       
+
     }
 }
