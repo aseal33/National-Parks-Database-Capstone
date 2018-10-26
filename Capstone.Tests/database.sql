@@ -1,7 +1,8 @@
-﻿DELETE FROM campground;
-DELETE FROM campsite;
+﻿DELETE FROM reservation;
+DELETE FROM site;
+DELETE FROM campground;
 DELETE FROM park;
-DELETE FROM reservation;
+
 
 
 -- INSERT Fake Data  ----------------------------
@@ -13,7 +14,7 @@ DECLARE @park int = (SELECT @@IDENTITY);
 
 
 ----- CAMPGROUND --------------------------------
-INSERT INTO campground (park_id, name, open_from, open_to, daily_fee)
+INSERT INTO campground (park_id, name, open_from_mm, open_to_mm, daily_fee)
 	VALUES (@park, 'Crystal Lake', 1, 12, 30.00);
 DECLARE @campground int = (SELECT @@IDENTITY);
 --DECLARE @dpt int;
@@ -29,7 +30,7 @@ DECLARE @campsite int = (SELECT @@IDENTITY);
 
 
 ----- RESERVATION ---------------------------
-INSERT INTO reservation (campsite_id, name, from_date, to_date, create_date)
+INSERT INTO reservation (site_id, name, from_date, to_date, create_date)
 	VALUES (@campsite, 'Seal', '2018-7-22', '2018-7-29', GETDATE());
 DECLARE @reservation int = (SELECT @@IDENTITY);
 
