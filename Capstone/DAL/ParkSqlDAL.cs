@@ -49,7 +49,7 @@ namespace Capstone.DAL
             return output;
         }
 
-        public Park GetParkInfo(int Park_Id)
+        public Park GetParkInfo(int park_Id)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
                     SqlCommand command = new SqlCommand("SELECT * FROM park WHERE park.park_id = @parkId", conn);
-                    command.Parameters.AddWithValue("@parkId", Park_Id);
+                    command.Parameters.AddWithValue("@parkId", park_Id);
 
                     SqlDataReader reader = command.ExecuteReader();
                     Park park = new Park();

@@ -11,7 +11,7 @@ namespace Capstone.Models
         public int Park_Id { get; set; }
 
         public string Name { get; set; }
-        
+
         public decimal Daily_Fee { get; set; }
 
         public int Opening_Month { get; set; }

@@ -4,14 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace capstone
+namespace Capstone
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             ProjectCLI cli = new ProjectCLI();
             cli.RunCLI();
+            Console.WriteLine("Thank you for using the park reservation system.");
         }
     }
 }

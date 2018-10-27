@@ -9,6 +9,6 @@ namespace Capstone.DAL
     {
         IList<Park> GetAllParks();
 
-        Park GetParkInfo(int Park_Id);
+        Park GetParkInfo(int park_Id);
     }
 }

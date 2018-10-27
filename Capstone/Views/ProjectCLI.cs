@@ -8,6 +8,7 @@ namespace Capstone.Models
 {
     public class ProjectCLI
     {
+        public const string DatabaseConnection = @"Data Source =.\sqlexpress;Initial Catalog = NPCampsite; Integrated Security = True";
 
         // CampgroundAvailability returns ILIST of Camp Sites
         // Keep date range
@@ -16,31 +17,29 @@ namespace Capstone.Models
         // PARKS
         private IList<Park> AllParks;
         private const string Level_Parks = "A";
-        private const string Command_GetAllParks = "1"; // in park // park id and park name 
-        // private const string Command_GetParkInfo = "2"; // in park // returns park - give int park id
+        private const string Command_GetAllParks = "1";
+        private const string Level_Park = "B";
         private const string Command_GetParkAvailability = "2";
         private const string Command_BackToParks = "3";
+        private const string Command_BackToPark = "2";
         private const int NoChosenPark = 0;
         private int ChosenParkID = 0;
 
-        // CAMPGROUNDS 
-        private const string Level_Campgrounds = "B";
-        private const string Command_GetAllCampgroundsFromPark = "1"; // in campground
+        // CAMPGROUNDS
+        private const string Level_Campgrounds = "C";
+        private const string Command_GetAllCampgroundsFromPark = "1";
 
         // CAMPGROUND
-        private const string Level_Campground = "C";
-        //private const string Command_GetCampgroundAvailability = "1"; // in campground
-        private const string Command_GetCampsitesFromCampground = "1"; // in campsite
-        //private const string Command_ChooseCampground = "2";
+        private const string Level_Campground = "D";
+        private const string Command_GetCampsitesFromCampground = "1";
         private const string Command_BackToCampgrounds = "2";
 
         // RESERVATION
-        private const string Level_Reservation = "D";
+        private const string Level_Reservation = "E";
         private const string Command_ChooseCampsite = "1";
         private const string Command_ReserveCampsite = "2";
 
         private const string Command_Quit = "Q";
-        public const string DatabaseConnection = @"Data Source =.\sqlexpress;Initial Catalog = NPCampsite; Integrated Security = True";
 
         private string Level_Current;
 
@@ -62,14 +61,28 @@ namespace Capstone.Models
 
                     // See which park they want to see
                     this.ChosenParkID = CLIHelper.GetInteger("Which park would you like to visit?");
+                    this.Level_Current = Level_Park;
+                }
+
+                if (this.Level_Current == Level_Park)
+                {
+                    if (this.ChosenParkID == NoChosenPark)
+                    {
+                        this.Level_Current = Level_Parks;
+                        continue;
+                    }
 
                     // see that park
                     this.GetPark_View(this.ChosenParkID);
 
                     // Ask what they want to do next
                     this.Park_View_AskNext();
-                    command = Console.ReadLine();
-
+                    command = "0";
+                    do
+                    {
+                        command = CLIHelper.GetString("> ");
+                    }
+                    while (command != Command_GetAllCampgroundsFromPark && command != Command_GetParkAvailability && command != Command_BackToParks);
                     switch (command)
                     {
                         case Command_GetAllCampgroundsFromPark:
@@ -78,13 +91,11 @@ namespace Capstone.Models
                         case Command_GetParkAvailability:
                             this.GetParkAvailability_View();
                             Console.ReadLine();
+                            this.Level_Current = Level_Parks;
                             continue;
                         case Command_BackToParks:
                             this.Level_Current = Level_Parks;
-                            Console.ReadLine();
-                            break;
-                        default:
-                            return;
+                            continue;
                     }
                 }
 
@@ -99,23 +110,90 @@ namespace Capstone.Models
                         this.Level_Current = Level_Parks;
                         continue;
                     }
+
+                    Console.WriteLine("Park Campgrounds");
+                    this.GetAllCampgrounds_View(this.ChosenParkID);
+                    this.Campgrounds_View_AskNext();
+
+                    command = "0";
+                    do
+                    {
+                        command = CLIHelper.GetString("> ");
+                    }
+                    while (command != Command_GetCampsitesFromCampground && command != Command_BackToPark);
+                    switch (command)
+                    {
+                        case Command_GetCampsitesFromCampground:
+                            this.Level_Current = Level_Reservation;
+                            continue;
+                        case Command_BackToPark:
+                            this.Level_Current = Level_Park;
+                            continue;
+                    }
+                }
+
+                // LEVEL: CAMPGROUND //////////////////////////////////////////
+                if (this.Level_Current == Level_Campground)
+                {
+                    // We should always have a chosen campground when we get here.
+                    // If we don't, kick us back up to parks
+                    Console.Clear();
+                    if (this.ChosenParkID == NoChosenPark)
+                    {
+                        this.Level_Current = Level_Parks;
+                        continue;
+                    }
                     else
                     {
-                        Console.WriteLine("Park Campgrounds");
+                        Console.WriteLine("Which campground would you like to reserve?");
+                        int[] campgroundIDs = this.GetAllCampgrounds_View(this.ChosenParkID);
+                        int selectedCampground = -1;
+                        do
+                        {
+                            selectedCampground = CLIHelper.GetInteger("Which campground? (enter 0 to cancel) ");
+
+                        } while (!campgroundIDs.Contains(selectedCampground));
+
+                        //Console.WriteLine($"{selectedCampground} is a valid campground");
+
+                        if (campgroundIDs.Length > 0)
+                        {
+                            foreach (int campgroundID in campgroundIDs)
+                            {
+
+                            }
+                        }
+                    }
+                }
+
+                // LEVEL: RESERVATION /////////////////////////////////////////
+                if (this.Level_Current == Level_Reservation)
+                {
+                    // We should always have a chosen campground when we get here.
+                    // If we don't, kick us back up to parks
+                    Console.Clear();
+                    if (this.ChosenParkID == NoChosenPark)
+                    {
+                        this.Level_Current = Level_Parks;
+                        continue;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Campgrounds available to reserve");
                         this.GetAllCampgrounds_View(this.ChosenParkID);
                         this.Campgrounds_View_AskNext();
-                        command = Console.ReadLine();
 
+                        command = CLIHelper.GetString("> ");
                         switch (command)
                         {
                             case Command_GetCampsitesFromCampground:
-                                this.Level_Current = Level_Campground;
+                                this.Level_Current = Level_Reservation;
                                 continue;
                             case Command_BackToCampgrounds:
-                                this.Level_Current = Level_Campground;
+                                this.Level_Current = Level_Campgrounds;
                                 continue;
                             default:
-                                return;
+                                continue;
                         }
                     }
                 }
@@ -245,7 +323,7 @@ namespace Capstone.Models
         }
 
         // LEVEL: CAMPGROUNDS /////////////////////////////////////////
-        private void GetAllCampgrounds_View(int parkID)
+        private int[] GetAllCampgrounds_View(int parkID)
         {
             CampgroundSqlDAL dal = new CampgroundSqlDAL(DatabaseConnection);
             Console.WriteLine(
@@ -259,14 +337,21 @@ namespace Capstone.Models
 
             if (campgrounds.Count > 0)
             {
+                int[] output = new int[campgrounds.Count];
+                int i = 0;
                 foreach (Campground campground in campgrounds)
                 {
                     this.PrintCampground(campground.Campground_Id, campground.Name, campground.Opening_Month, campground.Closing_Month, campground.Daily_Fee);
+                    output[i] = campground.Campground_Id;
+                    i++;
                 }
+
+                return output;
             }
             else
             {
                 Console.WriteLine("**** NO RESULTS ****");
+                return new int[0];
             }
         }
 
@@ -277,7 +362,14 @@ namespace Capstone.Models
             this.PrintOption(Command_BackToCampgrounds, "Return to previous screen.");
         }
 
-        // Campground
+
+        // LEVEL: CAMPGROUND  /////////////////////////////////////////
+        // private void Campground_View_AskNext()
+        // {
+        //    throw new NotImplementedException();
+        // }
+
+        // LEVEL: RESERVATION  /////////////////////////////////////////
         private void GetCampgroundAvailability_View()
         {
             DateTime startDate = CLIHelper.GetDateTime("What is the arrival date? mm/dd/yyyy");

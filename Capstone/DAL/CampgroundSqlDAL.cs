@@ -81,20 +81,6 @@ namespace Capstone.DAL
                         return output;
                     }
 
-                    //string query = "SELECT * FROM site INNER JOIN campground " +
-                    //    "ON campground.campground_id = site.campground_id WHERE site.site_id IN (SELECT site_id FROM site " +
-                    //    $"WHERE campground_id = {campground_Id} " +
-                    //    "EXCEPT " +
-                    //    "SELECT site.site_id FROM reservation " +
-                    //    "INNER JOIN site ON site.site_id = reservation.site_id " +
-                    //    $"WHERE campground_id = {campground_Id} AND ((to_date BETWEEN \'{start_date}\' AND \'{end_date}\') " +
-                    //    $"OR (from_date BETWEEN \'{start_date}\' AND \'{end_date}\') OR " +
-                    //    $"((from_date >= '{end_date}') AND (to_date <= '{start_date}'))))";
-
-
-                    //string start_date = string.Empty + startDate.Year + startDate.Month + startDate.Day;
-                    //string end_date = string.Empty + endDate.Year + endDate.Month + endDate.Day;
-
                     string query = $" SELECT * FROM site "
                     + $" INNER JOIN campground ON "
                     + $" campground.campground_id = site.campground_id "
@@ -108,11 +94,9 @@ namespace Capstone.DAL
                     + $"		OR	(from_date BETWEEN @startDate AND @endDate)"
                     + $"		OR	(from_date >= @endDate AND to_date <= @startDate)))";
 
-
                     SqlCommand cmd = new SqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@startDate", startDate);
                     cmd.Parameters.AddWithValue("@endDate", endDate);
-
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
