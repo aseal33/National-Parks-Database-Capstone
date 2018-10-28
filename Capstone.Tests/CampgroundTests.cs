@@ -38,6 +38,7 @@ namespace Capstone.Tests
             Assert.AreEqual(1, campgrounds.Count);
 
         }
+
         [TestMethod]
         public void GetAvailability_DateIsAvailable()
         {
