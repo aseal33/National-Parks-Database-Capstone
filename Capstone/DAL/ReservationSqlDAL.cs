@@ -25,7 +25,7 @@ namespace Capstone.DAL
                 using (SqlConnection conn = new SqlConnection(this.ConnectionString))
                 {
                     conn.Open();
-                    SqlCommand command = new SqlCommand($"INSERT INTO reservation VALUES (@site_id, @partyName, @start_date, @end_date, CURRENT_TIMESTAMP); DECLARE @reservationID int = (SELECT @@IDENTITY)", conn);
+                    SqlCommand command = new SqlCommand($"INSERT INTO reservation VALUES (@site_id, @partyName, @start_date, @end_date, CURRENT_TIMESTAMP);DECLARE @reservation int = (SELECT @@IDENTITY); SELECT @reservation AS res; ", conn);
                     command.Parameters.AddWithValue("@partyName", partyName + " " + "Family Reservation");
                     command.Parameters.AddWithValue("@start_date", start_date);
                     command.Parameters.AddWithValue("@end_date", end_date);
@@ -34,7 +34,7 @@ namespace Capstone.DAL
                     SqlDataReader reader = command.ExecuteReader();
                     while (reader.Read())
                     {
-                        id = Convert.ToInt32(reader["@reservationID"]);
+                        id = Convert.ToInt32(reader["res"]);
                     }
                 }
 

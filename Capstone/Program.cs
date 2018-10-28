@@ -12,7 +12,6 @@ namespace Capstone
         {
             ProjectCLI cli = new ProjectCLI();
             cli.RunCLI();
-            Console.WriteLine("Thank you for using the park reservation system.");
         }
     }
 }

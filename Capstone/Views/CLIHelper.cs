@@ -46,7 +46,7 @@ namespace Capstone.Models
 
                 Console.Write(message + " ");
                 userInput = Console.ReadLine();
-                Console.Write(userInput);
+
                 CheckQuit(userInput);
                 numberOfAttempts++;
             }

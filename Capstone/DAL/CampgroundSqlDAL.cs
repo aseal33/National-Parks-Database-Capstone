@@ -52,17 +52,18 @@ namespace Capstone.DAL
             return output;
         }
 
-        public IList<Campsite> CampgroundAvailability(int campground_Id, DateTime startDate, DateTime endDate)
+        public Campground CampgroundDetails(int campground_Id)
         {
-            List<Campsite> output = new List<Campsite>();
+            Campground campgroundToBook = new Campground();
+
+            // assumes you're giving it a valid campground, if not, it'll throw an error
             try
             {
-                using (SqlConnection conn = new SqlConnection(this.ConnectionString))
+                using (SqlConnection connection = new SqlConnection(this.ConnectionString))
                 {
-                    conn.Open();
-                    SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground_id = {campground_Id};", conn);
+                    connection.Open();
+                    SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground_id = {campground_Id};", connection);
                     SqlDataReader read = command.ExecuteReader();
-                    Campground campgroundToBook = new Campground();
                     while (read.Read())
                     {
                         campgroundToBook.Campground_Id = Convert.ToInt32(read["campground_id"]);
@@ -72,8 +73,42 @@ namespace Capstone.DAL
                         campgroundToBook.Closing_Month = Convert.ToInt32(read["open_to_mm"]);
                         campgroundToBook.Daily_Fee = Convert.ToDecimal(read["daily_fee"]);
                     }
+                }
 
-                    read.Close();
+                return campgroundToBook;
+            }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Likely an invalid campground ID.");
+                throw;
+            }
+        }
+
+        public IList<Campsite> CampgroundAvailability(int campground_Id, DateTime startDate, DateTime endDate)
+        {
+            List<Campsite> output = new List<Campsite>();
+            Campground campgroundToBook = this.CampgroundDetails(campground_Id);
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(this.ConnectionString))
+                {
+                    conn.Open();
+                    //SqlCommand command = new SqlCommand($"SELECT * FROM campground WHERE campground_id = {campground_Id};", conn);
+                    //SqlDataReader read = command.ExecuteReader();
+                    //Campground campgroundToBook = new Campground();
+                    //while (read.Read())
+                    //{
+                    //    campgroundToBook.Campground_Id = Convert.ToInt32(read["campground_id"]);
+                    //    campgroundToBook.Park_Id = Convert.ToInt32(read["park_id"]);
+                    //    campgroundToBook.Name = Convert.ToString(read["name"]);
+                    //    campgroundToBook.Opening_Month = Convert.ToInt32(read["open_from_mm"]);
+                    //    campgroundToBook.Closing_Month = Convert.ToInt32(read["open_to_mm"]);
+                    //    campgroundToBook.Daily_Fee = Convert.ToDecimal(read["daily_fee"]);
+                    //}
+
+                    //read.Close();
+
 
                     if (startDate.Month < campgroundToBook.Opening_Month || endDate.Month > campgroundToBook.Closing_Month)
                     {
